@@ -1,22 +1,30 @@
-use axum::{Router, routing::get};
-use std::path::PathBuf;
+use tokio::net::TcpListener;
 
-mod data;
-mod handlers;
+use server::git::GitService;
+use server::settings::Settings;
+use server::state::AppState;
 
 #[tokio::main]
 async fn main() {
-    let repo_path = PathBuf::from("../../")
-        .canonicalize()
-        .expect("failed to resolve repository path");
+    if let Err(error) = run().await {
+        eprintln!("fatal: {error}");
+        std::process::exit(1);
+    }
+}
 
-    data::init(repo_path.to_string_lossy().into_owned())
-        .expect("failed to initialize repository path");
+async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    let settings = Settings::load()?;
 
-    let app = Router::new()
-        .route("/", get(|| async { "Hello, World!" }))
-        .route("/branches", get(handlers::branch::get_branches_handler));
+    let git = GitService::open(&settings.repo)?;
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:5000").await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+    let listener = TcpListener::bind(settings.bind_addr()).await?;
+    eprintln!(
+        "serving {} on http://{}",
+        settings.repo.display(),
+        listener.local_addr()?
+    );
+
+    axum::serve(listener, server::app(&settings, AppState { git })?).await?;
+
+    Ok(())
 }

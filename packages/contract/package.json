@@ -1,0 +1,21 @@
+{
+  "name": "contract",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/schema.gen.ts",
+    "./openapi.json": "./openapi.json"
+  },
+  "scripts": {
+    "gen": "cargo run -q -p server --bin openapi -- openapi.json && vp exec openapi-typescript openapi.json --output src/schema.gen.ts",
+    "test": "pnpm run gen && git diff --exit-code -- openapi.json src/schema.gen.ts && test -z \"$(git ls-files --others --exclude-standard -- openapi.json src/schema.gen.ts)\""
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.13.0",
+    "typescript": "^6.0.2",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

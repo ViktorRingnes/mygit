@@ -1,3 +1,14 @@
 node_modules/
-.tanstack/
 target/
+
+dist/
+.tanstack/
+.vite-hooks/
+
+.env
+.env.*
+!.env.example
+
+**/config/local.toml
+
+.DS_Store

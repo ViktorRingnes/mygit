@@ -1,0 +1,8 @@
+repo = "../../.."
+
+[server]
+host = "0.0.0.0"
+port = 5000
+
+[cors]
+origins = ["http://localhost:6050"]

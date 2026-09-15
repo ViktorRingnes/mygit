@@ -1,0 +1,24 @@
+{
+  "name": "api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "contract": "workspace:*",
+    "openapi-fetch": "^0.17.0",
+    "openapi-typescript-helpers": "^0.1.0"
+  },
+  "devDependencies": {
+    "@tanstack/react-query": "latest",
+    "typescript": "^6.0.2",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "*"
+  }
+}
