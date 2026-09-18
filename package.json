@@ -4,12 +4,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "ready": "vp run check && vp run -r test && vp run -r build",
+    "ready": "vp run check && vp run -r test && vp run test:rust && vp run -r build",
     "check": "vp check && vp run check:rust",
     "check:rust": "cargo fmt --all --check && cargo clippy --workspace --all-targets -- -D warnings",
     "dev": "vp run web#dev",
     "gen": "vp run contract#gen",
-    "prepare": "vp config"
+    "prepare": "vp config",
+    "test:rust": "cargo test --workspace"
+  },
+  "dependencies": {
+    "@tanstack/store": "^0.11.1"
   },
   "devDependencies": {
     "vite": "catalog:",

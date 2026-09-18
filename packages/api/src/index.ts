@@ -47,6 +47,7 @@ export function createApi(options: ClientOptions) {
     query: <P extends Path<"get">, I extends Init<"get", P>>(path: P, ...args: Args<I>) =>
       queryOptions({
         queryKey: [path, args[0]?.params ?? null],
+        refetchOnWindowFocus: false,
         queryFn: () => get<P, I>(path, ...args),
       }),
   };

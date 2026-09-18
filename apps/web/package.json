@@ -24,6 +24,7 @@
     "@tanstack/react-router-devtools": "latest",
     "@tanstack/react-router-ssr-query": "latest",
     "@tanstack/react-start": "latest",
+    "@tanstack/react-store": "^0.11.1",
     "api": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

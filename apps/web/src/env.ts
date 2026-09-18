@@ -1,5 +1,3 @@
-import { z } from "zod";
-
-export const env = z
-  .object({ VITE_API_URL: z.url().default("http://localhost:5000") })
-  .parse(import.meta.env);
+export const env = {
+  VITE_API_URL: import.meta.env.VITE_API_URL ?? "http://localhost:5000",
+};

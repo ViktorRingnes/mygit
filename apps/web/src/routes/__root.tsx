@@ -3,15 +3,19 @@ import type { QueryClient } from "@tanstack/react-query";
 import { HeadContent, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 
+import { branchesQuery } from "#/lib/queries";
+import type { BranchStore } from "#/stores/branch";
+
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 
 import appCss from "../styles.css?url";
 
-interface MyRouterContext {
+interface RouterContext {
   queryClient: QueryClient;
+  branchStore: BranchStore;
 }
 
-export const Route = createRootRouteWithContext<MyRouterContext>()({
+export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
     meta: [
       {
@@ -22,7 +26,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "TanStack Start Starter",
+        title: "mygit",
       },
     ],
     links: [
@@ -32,6 +36,12 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       },
     ],
   }),
+  loader: async ({ context }) => {
+    context.branchStore.actions.sync(await context.queryClient.ensureQueryData(branchesQuery));
+  },
+  errorComponent: ({ error }) => (
+    <p className="p-8 text-destructive">{error instanceof Error ? error.message : String(error)}</p>
+  ),
   shellComponent: RootDocument,
 });
 

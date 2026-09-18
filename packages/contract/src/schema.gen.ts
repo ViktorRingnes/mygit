@@ -20,12 +20,122 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/commits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_commits"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tree": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_tree"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        Branches: {
+            default_branch: string | null;
+            head: string | null;
+            names: string[];
+        };
+        Commit: {
+            author: components["schemas"]["Signature"];
+            body: string | null;
+            committer: components["schemas"]["Signature"];
+            oid: string;
+            parents: string[];
+            summary: string;
+        };
+        Commits: {
+            commit: string;
+            entries: components["schemas"]["Commit"][];
+            has_more: boolean;
+            /** Format: int64 */
+            offset: number;
+            path: string | null;
+            rev: string;
+        };
+        Entry: {
+            kind: components["schemas"]["EntryKind"];
+            name: string;
+            oid: string;
+            path: string;
+            /** Format: int64 */
+            size: number | null;
+        };
+        /** @enum {string} */
+        EntryKind: "directory" | "file" | "symlink" | "submodule";
         ErrorResponse: {
             message: string;
+        };
+        File: {
+            binary: boolean;
+            commit: string;
+            oid: string;
+            oversized: boolean;
+            path: string;
+            rev: string;
+            /** Format: int64 */
+            size: number;
+            text: string | null;
+        };
+        Signature: {
+            email: string;
+            name: string;
+            /** Format: int32 */
+            offset_minutes: number;
+            /** Format: int64 */
+            timestamp: number;
+        };
+        Tree: {
+            commit: string;
+            entries: components["schemas"]["Entry"][];
+            has_more: boolean;
+            /** Format: int64 */
+            offset: number;
+            path: string;
+            rev: string;
+            /** Format: int64 */
+            total: number | null;
         };
     };
     responses: never;
@@ -50,7 +160,161 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": string[];
+                    "application/json": components["schemas"]["Branches"];
+                };
+            };
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_commits: {
+        parameters: {
+            query?: {
+                /** @description Branch, tag or commit to walk back from; defaults to the repository head */
+                rev?: string;
+                /** @description Only commits that changed this file or directory */
+                path?: string;
+                /** @description Commits to skip */
+                offset?: number;
+                /** @description Commits to return, 50 by default and 1000 at most */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Commits"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_file: {
+        parameters: {
+            query: {
+                /** @description Branch, tag or commit; defaults to the repository head */
+                rev?: string;
+                /** @description File to read */
+                path: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["File"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_tree: {
+        parameters: {
+            query?: {
+                /** @description Branch, tag or commit; defaults to the repository head */
+                rev?: string;
+                /** @description Directory to list; defaults to the repository root */
+                path?: string;
+                /** @description Levels to descend, 1 by default; 0 lists every level */
+                depth?: number;
+                /** @description Entries to skip */
+                offset?: number;
+                /** @description Entries to return, 1000 by default and 10000 at most */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Tree"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             500: {
